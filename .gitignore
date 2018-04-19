@@ -1,0 +1,12 @@
+*.suo
+*.opensdf
+*.sdf
+*.ipch
+*.vcxproj.user
+build/bin/*
+build/obj/*
+build/shaders/*
+thumbs.db
+desktop.ini
+*.db
+*.opendb

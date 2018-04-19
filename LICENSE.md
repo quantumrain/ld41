@@ -1,0 +1,1 @@
+Copyright 2018 Stephen Cakebread <https://github.com/quantumrain/LD41>

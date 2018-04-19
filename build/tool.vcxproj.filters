@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="base">
+      <UniqueIdentifier>{368cc551-58d2-467a-bd81-9058521beff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tool">
+      <UniqueIdentifier>{27b99947-0999-4079-b107-dfd01e03eae7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\base\pch.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\ut.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\vec_ops.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\vec_types.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\stb_image.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\platform.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\std.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\base.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\tool\tool.h">
+      <Filter>tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\base\asset.h">
+      <Filter>base</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\base\pch.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base\vec.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\base\std.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tool\main.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tool\import_wav.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tool\import_raw.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tool\import_png.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tool\import_font.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\tool\import_hlsl.cpp">
+      <Filter>tool</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
