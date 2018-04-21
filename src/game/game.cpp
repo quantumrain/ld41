@@ -1,6 +1,34 @@
 #include "pch.h"
 #include "game.h"
 
+/*
+
+	* idle automation + bullet hell *
+
+	hive
+	- produces 1 enemy to kill every 10 ticks
+	- commonly produces passive drones, but occasionally spawns aggressive enemies
+
+	turret
+	- kills 1 enemy every 20 ticks
+	- can't be placed too close to hives
+	- you have to collect the resources
+
+	collector
+	- collects resources in a radius
+	- collects 1 resouce every 30 ticks
+
+	generator
+	- uses 5 resources a tick, but doubles the speed of everything in radius
+	- overlapping power increases production linearly (e.g. x3 instead of x2)
+
+	inciter
+	- hives in radius produce two enemies every 10 ticks
+	- overlapping inciters increase production linearly
+	- twice as likely to spawn aggressive enemy
+
+*/
+
 const wchar_t* g_win_name = L"LD41 - ???";
 
 draw_list g_dl_world;
@@ -21,12 +49,29 @@ void start_game() {
 	w->entities.free();
 	w->handles.free();
 
+	w->camera_pos    = vec2();
+	w->camera_vel    = vec2();
+	w->camera_target = vec2();
+
 	spawn_entity(new player, vec2());
+	spawn_entity(new turret, vec2(-50.0f, 0.0f));
+	spawn_entity(new turret, vec2(+50.0f, 0.0f));
+
+	for(int y = -10; y < 10; y++) {
+		for(int x = -10; x < 10; x++) {
+			if (x && y)
+			{
+				vec2 p = vec2(x, y) * 150.0f + w->r.range(vec2(-50.0f, 50.0f));
+				spawn_entity(new hive, p);
+			}
+		}
+	}
 }
 
 enum game_state {
 	STATE_MENU,
 	STATE_GAME,
+	STATE_PAUSE,
 	STATE_RESULTS
 };
 
@@ -68,14 +113,23 @@ void game_frame(vec2 view_size) {
 	}
 	else if (g_state == STATE_GAME) {
 		if (is_key_pressed(KEY_ESCAPE)) {
-			g_state = STATE_MENU;
-
-			for(auto& e : w->entities)
-				destroy_entity(e);
+			g_state = STATE_PAUSE;
 		}
 
 		if (!get_player()) {
 			g_state = STATE_RESULTS;
+		}
+	}
+	else if (g_state == STATE_PAUSE) {
+		draw_string(dc_ui, vec2(320.0f, 80.0f), vec2(2.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(), "PAUSED");
+
+		draw_string(dc_ui, vec2(320.0f, 300.0f), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "press escape to resume");
+
+		if (is_key_pressed(KEY_ESCAPE)) {
+			g_state = STATE_GAME;
+
+			//for(auto& e : w->entities)
+			//	destroy_entity(e);
 		}
 	}
 	else if (g_state == STATE_RESULTS) {
@@ -89,23 +143,31 @@ void game_frame(vec2 view_size) {
 		}
 	}
 
-	world_tick(g_state == STATE_MENU);
+	world_tick(g_state != STATE_GAME);
 
 	psys_update();
 
 	// camera
 
 	if (player* pl = get_player()) {
-		vec2 player_pos = vec2();//pl->_pos;
+		vec2 player_pos = pl->_pos;
 
 		vec2  target_pos   = player_pos;
 		vec2  target_delta = target_pos - w->camera_target;
 
-		w->camera_old_target = target_pos;
+		w->camera_target = target_pos;
 
-		vec2 camera_delta = (w->camera_target - w->camera_pos) * 0.1f;
+		vec2 camera_delta = w->camera_target - w->camera_pos;
 
-		w->camera_pos += camera_delta;
+		vec2 lim = vec2 { 320.0f, 180.0f } * 0.9f;
+
+		if (fabsf(camera_delta.x) > lim.x) pl->_pos.x = w->camera_pos.x + lim.x * isign(camera_delta.x);
+		if (fabsf(camera_delta.y) > lim.y) pl->_pos.y = w->camera_pos.y + lim.y * isign(camera_delta.y);
+
+		//camera_delta.x = max(fabsf(camera_delta.x) - 80.0f, 0.0f) * isign(camera_delta.x);
+		//camera_delta.y = max(fabsf(camera_delta.y) - 45.0f, 0.0f) * isign(camera_delta.y);
+
+		w->camera_pos += camera_delta * 0.05f;
 	}
 
 	// view

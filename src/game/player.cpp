@@ -2,7 +2,7 @@
 #include "game.h"
 
 player::player() : entity(ET_PLAYER) {
-	_flags |= EF_PLAYER;
+	_flags |= EF_PLAYER | EF_UNIT;
 	_radius = 5.0f;
 }
 
@@ -25,7 +25,7 @@ void player::tick() {
 	if (length_sq(key_move) > 1.0f)
 		key_move = normalise(key_move);
 
-	key_move += to_vec2(g_input.mouse_rel) * 0.1f;
+	key_move += to_vec2(g_input.mouse_rel) * 0.05f;
 
 	_vel += key_move * 128.0f;
 
@@ -40,5 +40,5 @@ void player::draw(draw_context* dc) {
 	dc->translate(_pos);
 	dc->rotate_z(_rot);
 
-	dc->shape_outline(vec2(), 32, _radius, 0.0f, 0.5f, rgba());
+	dc->shape_outline(vec2(), 8, _radius, PI * 0.25f, 0.5f, rgba());
 }

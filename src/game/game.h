@@ -12,10 +12,18 @@ enum entity_flag : u16 {
 	EF_DESTROYED = 0x01,
 	EF_PLAYER    = 0x02,
 	EF_ENEMY     = 0x04,
+	EF_BUILDING  = 0x08,
+	EF_UNIT      = 0x10,
 };
 
 enum entity_type : u16 {
 	ET_PLAYER,
+	ET_HIVE,
+	ET_DRONE,
+	ET_TURRET,
+	ET_COLLECTOR,
+	ET_GENERATOR,
+	ET_INCITER,
 };
 
 struct entity_handle {
@@ -52,6 +60,54 @@ struct player : entity {
 	virtual void draw(draw_context* dc);
 };
 
+struct hive : entity {
+	hive();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+};
+
+struct drone : entity {
+	drone();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+};
+
+struct turret : entity {
+	turret();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+};
+
+struct collector : entity {
+	collector();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+};
+
+struct generator : entity {
+	generator();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+};
+
+struct inciter : entity {
+	inciter();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+};
+
 struct world {
 	random r;
 
@@ -61,7 +117,6 @@ struct world {
 	vec2 camera_pos;
 	vec2 camera_vel;
 	vec2 camera_target;
-	vec2 camera_old_target;
 
 	vec2 view_size;
 	mat44 view_proj;

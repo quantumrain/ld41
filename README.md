@@ -1,1 +1,1 @@
-???, made in 48 hours for Ludum Dare 41 - ???.
+???, made in 48 hours for Ludum Dare 41 - Two Incompatible Genres.

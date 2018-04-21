@@ -290,7 +290,7 @@ bool gpu_begin_frame() {
 	{
 		// hack to deal with drivers which lie about 60hz locking
 
-		float frame_ms = timer_ticks_to_ms(timer_ticks() - g->frame_start);
+		float frame_ms = (float)timer_ticks_to_ms(timer_ticks() - g->frame_start);
 	
 		static float smooth_ms = 16.67f;
 	
