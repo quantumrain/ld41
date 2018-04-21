@@ -96,7 +96,7 @@ void debug_set_proj_view(const mat44& proj_view) {
 
 // render debug
 
-void debug_render(vec2 view_size) {
+void debug_render(vec2 view_size, u64 game_ticks) {
 	// debug lines
 
 	{
@@ -137,13 +137,19 @@ void debug_render(vec2 view_size) {
 	{
 		// timing (move this into game_thread_proc)
 
+		struct sample {
+			float total;
+			float game;
+		};
+
 		const int MAX_H = 60;
-		static float h[MAX_H];
-		memmove(&h[0], &h[1], (MAX_H - 1) * sizeof(float));
+		static sample h[MAX_H];
+		memmove(&h[0], &h[1], (MAX_H - 1) * sizeof(sample));
 
 		static u64 t_prev = timer_ticks();
 		u64 t_cur = timer_ticks();
-		h[MAX_H - 1] = (float)timer_ticks_to_ms(t_cur - t_prev);
+		h[MAX_H - 1].total = (float)timer_ticks_to_ms(t_cur - t_prev);
+		h[MAX_H - 1].game = (float)timer_ticks_to_ms(game_ticks);
 		t_prev = t_cur;
 
 		// debug toggle
@@ -158,9 +164,9 @@ void debug_render(vec2 view_size) {
 		if (debug_show_stats) {
 			draw_context dc(g_debug_draw_2d);
 
-			float low	= h[0];
-			float high	= h[0];
-			float avg	= h[0];
+			float low	= h[0].total;
+			float high	= h[0].total;
+			float avg	= h[0].total;
 
 			float gap	= 2.0f;
 			float right	= (MAX_H - 1.0f) * gap;
@@ -174,17 +180,18 @@ void debug_render(vec2 view_size) {
 			gr.line(vec2(right, 0.0f), vec2(right, -50.0f), 0.25f, colours::GREEN);
 
 			for(int i = 1; i < MAX_H; i++) {
-				low   = min(low, h[i]);
-				high  = max(high, h[i]);
-				avg  += h[i];
+				low   = min(low, h[i].total);
+				high  = max(high, h[i].total);
+				avg  += h[i].total;
 
-				gr.line(vec2((i - 1) * gap, -h[i - 1]), vec2(i * gap, -h[i]), 0.25f, colours::YELLOW);
+				gr.line(vec2((i - 1) * gap, -h[i - 1].total), vec2(i * gap, -h[i].total), 0.25f, colours::YELLOW);
+				gr.line(vec2((i - 1) * gap, -h[i - 1].game), vec2(i * gap, -h[i].game), 0.25f, colours::RED);
 			}
 
 			avg /= (float)MAX_H;
 
 			draw_stringf(dc, vec2(640.0f, 51.0f), vec2(1.0f), TEXT_RIGHT, colours::SILVER, "%.1f / %.1f / %.1f", low, avg, high);
-			draw_stringf(dc, vec2(640.0f, 59.0f), vec2(1.0f), TEXT_RIGHT, colours::SILVER, "%.1fms (%.0f)", h[MAX_H - 1], 1000.0 / avg);
+			draw_stringf(dc, vec2(640.0f, 59.0f), vec2(1.0f), TEXT_RIGHT, colours::SILVER, "%.1fms (%.0f)", h[MAX_H - 1].total, 1000.0 / avg);
 		}
 	}
 

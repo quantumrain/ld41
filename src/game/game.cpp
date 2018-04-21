@@ -48,20 +48,23 @@ void start_game() {
 
 	w->entities.free();
 	w->handles.free();
+	w->salt = 0;
 
 	w->camera_pos    = vec2();
 	w->camera_vel    = vec2();
 	w->camera_target = vec2();
 
-	spawn_entity(new player, vec2());
-	spawn_entity(new turret, vec2(-50.0f, 0.0f));
-	spawn_entity(new turret, vec2(+50.0f, 0.0f));
+	w->limit = aabb2(-1000.0f, 1000.0f);
 
-	for(int y = -10; y < 10; y++) {
-		for(int x = -10; x < 10; x++) {
-			if (x && y)
-			{
-				vec2 p = vec2(x, y) * 150.0f + w->r.range(vec2(-50.0f, 50.0f));
+	w->resources = 0;
+
+	spawn_entity(new player, vec2());
+	spawn_entity(new turret, vec2(0.0f, -30.0f));
+
+	for(int y = -6; y < 6; y++) {
+		for(int x = -6; x <= 6; x++) {
+			if (abs(x) + abs(y) >= 2) {
+				vec2 p = vec2((f32)x, (f32)y) * 150.0f + w->r.range(vec2(-55.0f, 55.0f));
 				spawn_entity(new hive, p);
 			}
 		}
@@ -112,6 +115,8 @@ void game_frame(vec2 view_size) {
 		}
 	}
 	else if (g_state == STATE_GAME) {
+		draw_stringf(dc_ui, vec2(2.0f, 2.0f), vec2(1.0f), TEXT_LEFT | TEXT_TOP, rgba(0.75f, 1.0f, 0.0f, 1.0f), "$ %i", w->resources);
+
 		if (is_key_pressed(KEY_ESCAPE)) {
 			g_state = STATE_PAUSE;
 		}

@@ -14,6 +14,8 @@ enum entity_flag : u16 {
 	EF_ENEMY     = 0x04,
 	EF_BUILDING  = 0x08,
 	EF_UNIT      = 0x10,
+	EF_BULLET    = 0x20,
+	EF_PICKUP    = 0x40,
 };
 
 enum entity_type : u16 {
@@ -24,12 +26,16 @@ enum entity_type : u16 {
 	ET_COLLECTOR,
 	ET_GENERATOR,
 	ET_INCITER,
+	ET_BULLET,
+	ET_PICKUP,
 };
 
 struct entity_handle {
 	u16 index;
+	u16 salt;
 
-	explicit entity_handle(u16 index_ = 0xFFFF) : index(index_) { }
+	explicit entity_handle() : index(0xFFFF), salt(0) { }
+	explicit entity_handle(u16 index_, u16 salt_) : index(index_), salt(salt_) { }
 };
 
 struct entity {
@@ -50,6 +56,8 @@ struct entity {
 	f32  _rot;
 	f32  _radius;
 	rgba _colour;
+
+	float _lifetime;
 };
 
 struct player : entity {
@@ -66,6 +74,12 @@ struct hive : entity {
 	virtual void init();
 	virtual void tick();
 	virtual void draw(draw_context* dc);
+
+	static const int MAX_DRONES = 16;
+
+	float _time;
+
+	entity_handle _drones[MAX_DRONES];
 };
 
 struct drone : entity {
@@ -74,6 +88,11 @@ struct drone : entity {
 	virtual void init();
 	virtual void tick();
 	virtual void draw(draw_context* dc);
+
+	entity_handle _hive;
+	float _time;
+	float _aggressive;
+	bool _angry;
 };
 
 struct turret : entity {
@@ -82,6 +101,8 @@ struct turret : entity {
 	virtual void init();
 	virtual void tick();
 	virtual void draw(draw_context* dc);
+
+	float _time;
 };
 
 struct collector : entity {
@@ -90,6 +111,8 @@ struct collector : entity {
 	virtual void init();
 	virtual void tick();
 	virtual void draw(draw_context* dc);
+
+	float _time;
 };
 
 struct generator : entity {
@@ -108,11 +131,35 @@ struct inciter : entity {
 	virtual void draw(draw_context* dc);
 };
 
+struct bullet : entity {
+	bullet();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+
+	float _time;
+	float _speed;
+	entity_handle _target;
+};
+
+struct pickup : entity {
+	pickup();
+
+	virtual void init();
+	virtual void tick();
+	virtual void draw(draw_context* dc);
+
+	float _time;
+	entity_handle _target;
+};
+
 struct world {
 	random r;
 
 	list<entity> entities;
 	array<entity*> handles;
+	u16 salt;
 
 	vec2 camera_pos;
 	vec2 camera_vel;
@@ -120,6 +167,10 @@ struct world {
 
 	vec2 view_size;
 	mat44 view_proj;
+
+	aabb2 limit;
+
+	int resources;
 
 	world();
 };
@@ -136,7 +187,11 @@ int entity_move_slide(entity* e);
 
 player* get_player();
 
+entity* find_entity_near_point(vec2 pos, float range, entity_type type);
+entity* find_enemy_near_point(vec2 pos, float range);
 entity* find_enemy_near_line(vec2 from, vec2 to, float r);
+void avoid_crowd(world* w, entity* self);
+void avoid_buildings(world* w, entity* self);
 
 void world_tick(bool paused);
 void world_draw(draw_context* dc);

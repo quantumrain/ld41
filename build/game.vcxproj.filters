@@ -134,6 +134,15 @@
     <ClCompile Include="..\src\game\hive.cpp">
       <Filter>game</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\game\bullet.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\game\pickup.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\game\collector.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\shaders\fs_blur_x.hlsl">

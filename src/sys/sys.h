@@ -209,7 +209,7 @@ void debug_set_proj_view(const mat44& proj_view);
 
 void debug_init();
 void debug_step();
-void debug_render(vec2 view_size);
+void debug_render(vec2 view_size, u64 game_ticks);
 
 // assets
 

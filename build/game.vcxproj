@@ -48,7 +48,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -240,12 +240,15 @@
     </ClCompile>
     <ClCompile Include="..\src\base\std.cpp" />
     <ClCompile Include="..\src\base\vec.cpp" />
+    <ClCompile Include="..\src\game\bullet.cpp" />
+    <ClCompile Include="..\src\game\collector.cpp" />
     <ClCompile Include="..\src\game\drone.cpp" />
     <ClCompile Include="..\src\game\game.cpp" />
     <ClCompile Include="..\src\game\generator.cpp" />
     <ClCompile Include="..\src\game\hive.cpp" />
     <ClCompile Include="..\src\game\inciter.cpp" />
     <ClCompile Include="..\src\game\particles.cpp" />
+    <ClCompile Include="..\src\game\pickup.cpp" />
     <ClCompile Include="..\src\game\player.cpp" />
     <ClCompile Include="..\src\game\tile_map.cpp" />
     <ClCompile Include="..\src\game\turret.cpp" />

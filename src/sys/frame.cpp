@@ -53,7 +53,12 @@ void frame_step(vec2 view_size) {
 	gpu_set_render_target(g_draw_target, g_depth_target);
 	gpu_set_viewport(vec2(0, 0), view_size, vec2(0.0f, 1.0f));
 
+	u64 game_start = timer_ticks();
+
 	game_frame(view_size);
+
+	u64 game_end = timer_ticks();
+
 	g_bloom_fx.render_levels_from_source(g_draw_target);
 
 	// combine
@@ -71,7 +76,7 @@ void frame_step(vec2 view_size) {
 
 	// debug
 
-	debug_render(view_size);
+	debug_render(view_size, game_end - game_start);
 
 	gpu_set_textures({});
 }
