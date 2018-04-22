@@ -25,6 +25,9 @@ void pickup::tick() {
 		vec2 d = p->_pos - _pos;
 		float l = length_sq(d);
 
+		if (p->_time_since_hit > 0.5f)
+			l = square(100.0f);
+
 		auto collect = [&]() {
 				sound_play(sfx::PICKUP, 0.0f, get_vol(_pos) - 6.0f, 0);
 				g_world.resources++;
@@ -34,9 +37,10 @@ void pickup::tick() {
 				if (g_world.resources == TURRET_COST   ) sound_play(sfx::TURRET_ACQ, 0.0f, 3.0f);
 				if (g_world.resources == COLLECTOR_COST) sound_play(sfx::COLLECTOR_ACQ, 0.0f, 3.0f);
 				if (g_world.resources == INCITER_COST  ) sound_play(sfx::INCITER_ACQ, 0.0f, 3.0f);
+				if (g_world.resources == GENERATOR_COST) sound_play(sfx::GENERATOR_ACQ, 0.0f, 3.0f);
 
-				if ((g_world.resources == g_world.total_resources) && (g_world.resources >= TURRET_COST))
-					fx_message("press [1] to deploy turret");
+				if ((g_world.num_turrets <= 1) && (g_world.resources >= TURRET_COST))
+					fx_message("press [1] to deploy <T>", 3.0f);
 			};
 
 		if (l < square(_radius + p->_radius)) {

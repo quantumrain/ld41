@@ -250,6 +250,7 @@ enum class sfx {
 	TURRET_ACQ,
 	COLLECTOR_ACQ,
 	INCITER_ACQ,
+	GENERATOR_ACQ,
 	PICKUP,
 	_MAX
 };

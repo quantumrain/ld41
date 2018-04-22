@@ -101,9 +101,10 @@ void fx_circle(vec2 pos, float radius, int count, float wobble, rgba c, int dur_
 	}
 }
 
-void fx_message(const char* message) {
+void fx_message(const char* message, float time) {
 	g_world.message = message;
-	g_world.message_time = 1.5f;
+	g_world.message_time = time;
+	g_world.message_max_time = time;
 }
 
 float get_vol(vec2 pos) {

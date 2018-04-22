@@ -9,6 +9,7 @@ player::player() : entity(ET_PLAYER) {
 }
 
 void player::init() {
+	fx_message("<T> will protect you", 4.0f);
 }
 
 void player::tick() {
@@ -27,12 +28,15 @@ void player::tick() {
 	if (length_sq(key_move) > 1.0f)
 		key_move = normalise(key_move);
 
-	if (is_key_pressed(KEY_1)) buy(ET_TURRET);
-	if (is_key_pressed(KEY_2)) buy(ET_COLLECTOR);
-	if (is_key_pressed(KEY_3)) buy(ET_INCITER);
+	if (_lifetime > 3.0f) {
+		if (is_key_pressed(KEY_1) || (g_input.pad_buttons_pressed & PAD_A)) buy(ET_TURRET);
+		if (is_key_pressed(KEY_2) || (g_input.pad_buttons_pressed & PAD_X)) buy(ET_COLLECTOR);
+		if (is_key_pressed(KEY_3) || (g_input.pad_buttons_pressed & PAD_B)) buy(ET_INCITER);
+		if (is_key_pressed(KEY_4) || (g_input.pad_buttons_pressed & PAD_Y)) buy(ET_GENERATOR);
+	}
 
 	//if (is_key_pressed(KEY_F5)) {
-	//	g_world.resources += 150;
+	//	g_world.resources += 639;
 	//}
 
 	key_move += to_vec2(g_input.mouse_rel) * 0.05f;
@@ -80,7 +84,21 @@ void player::hit() {
 		}
 	}
 	else {
-		g_world.resources = max((g_world.resources / 2) - 5, 0);
+		int num = g_world.resources;
+
+		g_world.resources = max((g_world.resources / 2) - 1, 0);
+
+		num -= g_world.resources;
+
+		if (num > 0) {
+			num = clamp(num, 0, 4);
+
+			for(int i = 0; i < num; i++) {
+				entity* e = spawn_entity(new pickup(), _pos);
+				e->_vel = g_world.r.range(vec2(256.0f));
+			}
+		}
+
 		sound_play(sfx::PLAYER_HIT);
 		fx_explosion(_pos, 1.0f, 30, rgba(1.0f, 0.1f, 0.1f, 1.0f), 1.0f);
 		_time_since_hit = PLAYER_VULNERABLE_TIME;
@@ -107,6 +125,7 @@ void player::buy(entity_type item) {
 		case ET_TURRET:    cost = TURRET_COST;    break;
 		case ET_COLLECTOR: cost = COLLECTOR_COST; break;
 		case ET_INCITER:   cost = INCITER_COST;   break;
+		case ET_GENERATOR: cost = GENERATOR_COST; break;
 	}
 
 	if ((cost <= 0) || (cost > g_world.resources)) {
@@ -114,6 +133,7 @@ void player::buy(entity_type item) {
 			case ET_TURRET:    g_world.error_hotbar_turret    = 0.5f; break;
 			case ET_COLLECTOR: g_world.error_hotbar_collector = 0.5f; break;
 			case ET_INCITER:   g_world.error_hotbar_inciter   = 0.5f; break;
+			case ET_GENERATOR: g_world.error_hotbar_generator = 0.5f; break;
 		}
 
 		sound_play(sfx::UI_NO);
@@ -148,11 +168,13 @@ void player::buy(entity_type item) {
 		case ET_TURRET:		spawn_entity(new turret, _pos + shop_ofs);		break;
 		case ET_COLLECTOR:	spawn_entity(new collector, _pos + shop_ofs);	break;
 		case ET_INCITER:	spawn_entity(new inciter, _pos + shop_ofs);		break;
+		case ET_GENERATOR:	spawn_entity(new generator, _pos + shop_ofs);	break;
 	}
 
 	switch(item) {
 		case ET_TURRET:    g_world.flash_hotbar_turret    = 0.25f; break;
 		case ET_COLLECTOR: g_world.flash_hotbar_collector = 0.25f; break;
 		case ET_INCITER:   g_world.flash_hotbar_inciter   = 0.25f; break;
+		case ET_GENERATOR: g_world.flash_hotbar_generator = 0.25f; break;
 	}
 }

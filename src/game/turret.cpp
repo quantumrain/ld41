@@ -12,11 +12,18 @@ turret::turret() : entity(ET_TURRET) {
 void turret::init() {
 	fx_circle(_pos, TURRET_RANGE, 256, 1.0f, _colour * rgba(0.5f, 1.0f), 4);
 	fx_circle(_pos, TURRET_RANGE, 256, 1.0f, _colour, 4);
+
+	g_world.num_turrets++;
 }
 
 void turret::tick() {
-	if (_time > 0.0f)
+	if (_time > 0.0f) {
 		_time -= DT;
+
+		if (g_world.ultimate) {
+			_time -= DT * 4.0f;
+		}
+	}
 
 	if (_time <= 0.0f) {
 		if (entity* e = find_enemy_near_point(_pos, TURRET_RANGE)) {

@@ -41,6 +41,12 @@ void hive::tick() {
 	}
 #endif
 
+	if (g_world.ultimate) {
+		_time -= DT * 10.0f;
+		near_inciters++;
+		_num_spawned = 1000;
+	}
+
 	if (_time < 0.0f) {
 		_time += g_world.r.range(9.0f, 11.0f);
 

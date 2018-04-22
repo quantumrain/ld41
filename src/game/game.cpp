@@ -31,7 +31,7 @@
 
 extern random g_rand;
 
-const wchar_t* g_win_name = L"LD41 - ???";
+const wchar_t* g_win_name = L"LD41 - plasimajita";
 
 draw_list g_dl_world;
 draw_list g_dl_ui;
@@ -59,6 +59,7 @@ void game_init() {
 	define_sound(sfx::TURRET_ACQ,     "turret_acq",     2, 2);
 	define_sound(sfx::COLLECTOR_ACQ,  "collector_acq",  2, 2);
 	define_sound(sfx::INCITER_ACQ,    "inciter_acq",    2, 2);
+	define_sound(sfx::GENERATOR_ACQ,  "generator_acq",  2, 2);
 	define_sound(sfx::PICKUP,         "pickup",         10, 2);
 
 	psys_init(8000);
@@ -89,13 +90,19 @@ void start_game() {
 	w->flash_hotbar_turret = 0;
 	w->flash_hotbar_collector = 0;
 	w->flash_hotbar_inciter = 0;
+	w->flash_hotbar_generator = 0;
 
 	w->error_hotbar_turret = 0;
 	w->error_hotbar_collector = 0;
 	w->error_hotbar_inciter = 0;
+	w->error_hotbar_generator = 0;
 
 	w->message = 0;
 	w->message_time = 0;
+	w->message_max_time = 0;
+
+	w->ultimate = false;
+	w->num_turrets = 0;
 
 	spawn_entity(new player, vec2());
 	spawn_entity(new turret, vec2(0.0f, -30.0f));
@@ -146,15 +153,21 @@ void game_frame(vec2 view_size) {
 		};
 
 	if (g_state == STATE_MENU) {
-		draw_string(dc_ui, vec2(320.0f, 80.0f), vec2(4.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(), "???");
+		draw_string(dc_ui, vec2(320.0f, 80.0f), vec2(4.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(), "plasimajita");
 		draw_string(dc_ui, vec2(320.0f, 110.0f), vec2(0.75f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "created for ludum dare 41 by stephen cakebread @quantumrain");
 
-		draw_string(dc_ui, vec2(320.0f, 160.0f), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.8f), "controls - ???");
-		draw_string(dc_ui, vec2(320.0f, 175.0f), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.8f), "fullscreen - F11");
+		draw_string(dc_ui, vec2(320.0f, 160.0f), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(1.0f), "controls");
+		draw_string(dc_ui, vec2(180.0f, 175.0f), vec2(1.5f), TEXT_LEFT | TEXT_VCENTRE, rgba(0.6f), "mouse");
+		draw_string(dc_ui, vec2(180.0f, 190.0f), vec2(1.5f), TEXT_LEFT | TEXT_VCENTRE, rgba(0.6f), "1 2 3 4");
+		draw_string(dc_ui, vec2(180.0f, 205.0f), vec2(1.5f), TEXT_LEFT | TEXT_VCENTRE, rgba(0.6f), "F11");
 
-		draw_string(dc_ui, vec2(320.0f, 220.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(1.0f), "blah blah");
-		draw_string(dc_ui, vec2(320.0f, 230.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "blah blah");
-		draw_string(dc_ui, vec2(320.0f, 240.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "blah blah");
+		draw_string(dc_ui, vec2(460.0f, 175.0f), vec2(1.5f), TEXT_RIGHT | TEXT_VCENTRE, rgba(0.6f), "movement");
+		draw_string(dc_ui, vec2(460.0f, 190.0f), vec2(1.5f), TEXT_RIGHT | TEXT_VCENTRE, rgba(0.6f), "deploy structure");
+		draw_string(dc_ui, vec2(460.0f, 205.0f), vec2(1.5f), TEXT_RIGHT | TEXT_VCENTRE, rgba(0.6f), "fullscreen");
+
+		draw_string(dc_ui, vec2(320.0f, 250.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "playing with a mouse is recommended");
+		draw_string(dc_ui, vec2(320.0f, 260.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "but arrow keys and joypad do work");
+		draw_string(dc_ui, vec2(320.0f, 270.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(0.6f), "if you prefer them.");
 
 		draw_string(dc_ui, vec2(320.0f, 300.0f), vec2(1.5f), TEXT_CENTRE | TEXT_VCENTRE, rgba(), "left click to start");
 
@@ -223,16 +236,17 @@ void game_frame(vec2 view_size) {
 				draw_stringf(u, vec2(20.0f, 3.0f), vec2(0.5f), TEXT_CENTRE | TEXT_VCENTRE, c, "$ %i", cost);
 			};
 
-		draw_item(vec2(ui_rect.max.x - 125, ui_rect.max.y - 50.0f), TURRET_COST, 1, "T", rgba(0.1f, 0.85f, 0.25f, 1.0f), w->flash_hotbar_turret, w->error_hotbar_turret);
-		draw_item(vec2(ui_rect.max.x - 85, ui_rect.max.y - 50.0f), COLLECTOR_COST, 2, "C", rgba(0.5f, 0.1f, 1.0f, 1.0f), w->flash_hotbar_collector, w->error_hotbar_collector);
-		draw_item(vec2(ui_rect.max.x - 45, ui_rect.max.y - 50.0f), INCITER_COST, 3, "X", rgba(0.25f, 0.75f, 0.75f, 1.0f), w->flash_hotbar_inciter, w->error_hotbar_inciter);
+		draw_item(vec2(ui_rect.max.x - 165, ui_rect.max.y - 50.0f), TURRET_COST, 1, "T", rgba(0.1f, 0.85f, 0.25f, 1.0f), w->flash_hotbar_turret, w->error_hotbar_turret);
+		draw_item(vec2(ui_rect.max.x - 125, ui_rect.max.y - 50.0f), COLLECTOR_COST, 2, "C", rgba(0.5f, 0.1f, 1.0f, 1.0f), w->flash_hotbar_collector, w->error_hotbar_collector);
+		draw_item(vec2(ui_rect.max.x - 85, ui_rect.max.y - 50.0f), INCITER_COST, 3, "X", rgba(0.25f, 0.75f, 0.75f, 1.0f), w->flash_hotbar_inciter, w->error_hotbar_inciter);
+		draw_item(vec2(ui_rect.max.x - 45, ui_rect.max.y - 50.0f), GENERATOR_COST, 4, "U", rgba(1.25f, 1.0f, 0.5f, 1.0f), w->flash_hotbar_generator, w->error_hotbar_generator);
 
 		if (w->message) {
 			w->message_time -= DT;
 
 			if (w->message_time > 0.0f) {
 				float f0 = clamp(w->message_time * 3.0f, 0.0f, 1.0f);
-				float f1 = 1.0f - clamp((1.5f - w->message_time) * 3.0f, 0.0f, 1.0f);
+				float f1 = 1.0f - clamp((w->message_max_time - w->message_time) * 3.0f, 0.0f, 1.0f);
 				float f = lerp(f0, 1.5f, f1);
 
 				draw_string(dc_ui, vec2(320.0f, 280.0f), vec2(1.0f), TEXT_CENTRE | TEXT_VCENTRE, rgba(f), w->message);
@@ -240,6 +254,7 @@ void game_frame(vec2 view_size) {
 			else {
 				w->message = 0;
 				w->message_time = 0;
+				w->message_max_time = 0;
 			}
 		}
 

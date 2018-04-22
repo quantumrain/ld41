@@ -12,11 +12,16 @@ world::world()
 	, flash_hotbar_turret()
 	, flash_hotbar_collector()
 	, flash_hotbar_inciter()
+	, flash_hotbar_generator()
 	, error_hotbar_turret()
 	, error_hotbar_collector()
 	, error_hotbar_inciter()
+	, error_hotbar_generator()
 	, message()
 	, message_time()
+	, message_max_time()
+	, ultimate()
+	, num_turrets()
 { }
 
 // entity

@@ -11,12 +11,14 @@ struct world;
 #define TURRET_RANGE           (120.0f)
 #define COLLECTOR_RANGE        (160.0f)
 #define INCITER_RANGE          (250.0f)
+#define GENERATOR_RANGE	       (250.0f)
 
 #define PLAYER_VULNERABLE_TIME (4.0f)
 
 #define TURRET_COST    (8)
 #define COLLECTOR_COST (16)
 #define INCITER_COST   (64)
+#define GENERATOR_COST (640)
 
 enum entity_flag : u16 {
 	EF_DESTROYED = 0x01,
@@ -201,13 +203,19 @@ struct world {
 	float flash_hotbar_turret;
 	float flash_hotbar_collector;
 	float flash_hotbar_inciter;
+	float flash_hotbar_generator;
 
 	float error_hotbar_turret;
 	float error_hotbar_collector;
 	float error_hotbar_inciter;
+	float error_hotbar_generator;
 
 	const char* message;
 	float message_time;
+	float message_max_time;
+
+	bool ultimate;
+	int num_turrets;
 
 	world();
 };
@@ -256,6 +264,6 @@ void psys_render(draw_context* dc);
 void psys_spawn(vec2 pos, vec2 vel, float damp, float size0, float size1, float rot_v, rgba c, int lifetime);
 void fx_explosion(vec2 pos, float strength, int count, rgba c, float psize);
 void fx_circle(vec2 pos, float radius, int count, float wobble, rgba c, int dur_mult = 1);
-void fx_message(const char* message);
+void fx_message(const char* message, float time = 1.5f);
 
 float get_vol(vec2 pos);
