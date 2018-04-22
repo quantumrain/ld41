@@ -210,4 +210,4 @@ frustum make_frustum(const mat44& m);
 vec3 intersect_planes_3(const vec4& a, const vec4& b, const vec4& c);
 
 mat44 top_down_proj_view(vec2 centre, float fov, float aspect, float virtual_height, float z_near, float z_far);
-mat44 fit_ui_proj_view(float virtual_width, float virtual_height, float aspect, float z_near, float z_far);
+mat44 fit_ui_proj_view(float virtual_width, float virtual_height, float aspect, float z_near, float z_far, aabb2* rect);

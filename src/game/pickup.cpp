@@ -10,6 +10,9 @@ pickup::pickup() : entity(ET_PICKUP) {
 
 void pickup::init() {
 	_vel = g_world.r.range(vec2(30.0f));
+
+	if (g_world.resources == 0)
+		fx_message("collect $");
 }
 
 void pickup::tick() {
@@ -22,10 +25,22 @@ void pickup::tick() {
 		vec2 d = p->_pos - _pos;
 		float l = length_sq(d);
 
+		auto collect = [&]() {
+				sound_play(sfx::PICKUP, 0.0f, get_vol(_pos) - 6.0f, 0);
+				g_world.resources++;
+				g_world.total_resources++;
+				destroy_entity(this);
+
+				if (g_world.resources == TURRET_COST   ) sound_play(sfx::TURRET_ACQ, 0.0f, 3.0f);
+				if (g_world.resources == COLLECTOR_COST) sound_play(sfx::COLLECTOR_ACQ, 0.0f, 3.0f);
+				if (g_world.resources == INCITER_COST  ) sound_play(sfx::INCITER_ACQ, 0.0f, 3.0f);
+
+				if ((g_world.resources == g_world.total_resources) && (g_world.resources >= TURRET_COST))
+					fx_message("press [1] to deploy turret");
+			};
+
 		if (l < square(_radius + p->_radius)) {
-			sound_play(sfx::DIT, 0.0f, 0.0f, 0);
-			g_world.resources++;
-			destroy_entity(this);
+			collect();
 		}
 		else if (l < square(48.0f)) {
 			_vel += d * (80.0f / sqrtf(l));
@@ -37,10 +52,12 @@ void pickup::tick() {
 				vec2 d = e->_pos - _pos;
 				float l = length_sq(d);
 
-				if (l < square(_radius + e->_radius)) {
-					sound_play(sfx::DIT, 0.0f, 0.0f, 0);
-					g_world.resources++;
-					destroy_entity(this);
+				if (l < square(_radius + e->_radius + 1.0f)) {
+					if (e->_type == ET_COLLECTOR) {
+						((collector*)e)->_collected = 0.25f;
+					}
+
+					collect();
 				}
 				else {
 					_vel += d * (40.0f / sqrtf(l));

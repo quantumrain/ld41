@@ -210,7 +210,7 @@ mat44 top_down_proj_view(vec2 centre, float fov, float aspect, float virtual_hei
 	return proj * view;
 }
 
-mat44 fit_ui_proj_view(float virtual_width, float virtual_height, float aspect, float z_near, float z_far) {
+mat44 fit_ui_proj_view(float virtual_width, float virtual_height, float aspect, float z_near, float z_far, aabb2* rect) {
 	float width  = virtual_width;
 	float height = virtual_height;
 
@@ -221,6 +221,13 @@ mat44 fit_ui_proj_view(float virtual_width, float virtual_height, float aspect, 
 
 	float left = (virtual_width - width) * 0.5f;
 	float top  = (virtual_height - height) * 0.5f;
+
+	if (rect) {
+		rect->min.x = left;
+		rect->min.y = top;
+		rect->max.x = left + width;
+		rect->max.y = top + height;
+	}
 
 	return ortho(left, left + width, top + height, top, z_near, z_far);
 }

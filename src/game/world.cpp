@@ -5,11 +5,23 @@ world g_world;
 
 // world
 
-world::world() : salt(), resources() { }
+world::world()
+	: salt()
+	, resources()
+	, total_resources()
+	, flash_hotbar_turret()
+	, flash_hotbar_collector()
+	, flash_hotbar_inciter()
+	, error_hotbar_turret()
+	, error_hotbar_collector()
+	, error_hotbar_inciter()
+	, message()
+	, message_time()
+{ }
 
 // entity
 
-entity::entity(entity_type type) : _flags(), _type(type), _rot(0.0f), _radius(8.0f) { }
+entity::entity(entity_type type) : _flags(), _type(type), _rot(0.0f), _radius(8.0f), _lifetime() { }
 entity::~entity() { }
 
 void entity::init() { }
@@ -129,6 +141,33 @@ entity* find_entity_near_point(vec2 pos, float range, entity_type type) {
 			continue;
 
 		float t = length_sq(e->_pos - pos);
+
+		if (t < best_t) {
+			best   = e;
+			best_t = t;
+		}
+	}
+
+	return best;
+}
+
+entity* find_building_near_point(vec2 pos, float range) {
+	entity* best   = 0;
+	float   best_t = range;
+
+	for(auto* e : g_world.entities) {
+		if (e->_flags & EF_DESTROYED)
+			continue;
+
+		if (!(e->_flags & EF_BUILDING))
+			continue;
+
+		float r = e->_radius;
+
+		if (e->_type == ET_HIVE)
+			r *= 0.75f;
+
+		float t = length(e->_pos - pos) - r;
 
 		if (t < best_t) {
 			best   = e;
@@ -274,7 +313,17 @@ void world_tick(bool paused) {
 void world_draw(draw_context* dc) {
 	world* w = &g_world;
 
-	dc->rect_outline(w->limit.min, w->limit.max, 0.5f, rgba(0.1f, 1.0f));
+	for(int y = -6; y <= 6; y++) {
+		for(int x = -6; x <= 6; x++) {
+			random r((x * 100) + y);
+
+			for(int i = 0; i < 10; i++) {
+				dc->shape(vec2(150.0f * x, 150.0f * y) + r.range(vec2(75.0f)), 4, r.range(40.0f, 60.0f), r.range(PI), rgba(0.04f, 0.05f, 0.1f, 0.0f));
+			}
+		}
+	}
+
+	//dc->rect_outline(w->limit.min, w->limit.max, 0.5f, rgba(0.1f, 1.0f));
 
 	psys_render(&dc->copy());
 

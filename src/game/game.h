@@ -8,6 +8,16 @@
 
 struct world;
 
+#define TURRET_RANGE           (120.0f)
+#define COLLECTOR_RANGE        (160.0f)
+#define INCITER_RANGE          (250.0f)
+
+#define PLAYER_VULNERABLE_TIME (4.0f)
+
+#define TURRET_COST    (8)
+#define COLLECTOR_COST (16)
+#define INCITER_COST   (64)
+
 enum entity_flag : u16 {
 	EF_DESTROYED = 0x01,
 	EF_PLAYER    = 0x02,
@@ -66,6 +76,11 @@ struct player : entity {
 	virtual void init();
 	virtual void tick();
 	virtual void draw(draw_context* dc);
+
+	void hit();
+	void buy(entity_type item);
+
+	float _time_since_hit;
 };
 
 struct hive : entity {
@@ -78,6 +93,10 @@ struct hive : entity {
 	static const int MAX_DRONES = 16;
 
 	float _time;
+	int _incited;
+	int _num_spawned;
+	float _anim;
+	float _anim_r;
 
 	entity_handle _drones[MAX_DRONES];
 };
@@ -93,6 +112,7 @@ struct drone : entity {
 	float _time;
 	float _aggressive;
 	bool _angry;
+	float _spot;
 };
 
 struct turret : entity {
@@ -103,6 +123,7 @@ struct turret : entity {
 	virtual void draw(draw_context* dc);
 
 	float _time;
+	float _fired;
 };
 
 struct collector : entity {
@@ -113,6 +134,7 @@ struct collector : entity {
 	virtual void draw(draw_context* dc);
 
 	float _time;
+	float _collected;
 };
 
 struct generator : entity {
@@ -129,6 +151,9 @@ struct inciter : entity {
 	virtual void init();
 	virtual void tick();
 	virtual void draw(draw_context* dc);
+
+	float _time;
+	float _flash;
 };
 
 struct bullet : entity {
@@ -171,6 +196,18 @@ struct world {
 	aabb2 limit;
 
 	int resources;
+	int total_resources;
+
+	float flash_hotbar_turret;
+	float flash_hotbar_collector;
+	float flash_hotbar_inciter;
+
+	float error_hotbar_turret;
+	float error_hotbar_collector;
+	float error_hotbar_inciter;
+
+	const char* message;
+	float message_time;
 
 	world();
 };
@@ -188,6 +225,7 @@ int entity_move_slide(entity* e);
 player* get_player();
 
 entity* find_entity_near_point(vec2 pos, float range, entity_type type);
+entity* find_building_near_point(vec2 pos, float range);
 entity* find_enemy_near_point(vec2 pos, float range);
 entity* find_enemy_near_line(vec2 from, vec2 to, float r);
 void avoid_crowd(world* w, entity* self);
@@ -217,3 +255,7 @@ void psys_render(draw_context* dc);
 
 void psys_spawn(vec2 pos, vec2 vel, float damp, float size0, float size1, float rot_v, rgba c, int lifetime);
 void fx_explosion(vec2 pos, float strength, int count, rgba c, float psize);
+void fx_circle(vec2 pos, float radius, int count, float wobble, rgba c, int dur_mult = 1);
+void fx_message(const char* message);
+
+float get_vol(vec2 pos);

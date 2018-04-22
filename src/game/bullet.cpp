@@ -42,7 +42,7 @@ void bullet::tick() {
 	if (entity* e = find_enemy_near_line(_old_pos, _pos, _radius)) {
 		if (e->_type == ET_DRONE) {
 			fx_explosion(e->_pos, 0.5f, 3, rgba(1.0f, 0.0f, 0.0f, 0.0f), 0.5f);
-			sound_play(sfx::DIT, -10.0f, 0.0f, 0);
+			sound_play(sfx::DRONE_HIT, 0.0f, get_vol(_pos));
 			spawn_entity(new pickup, e->_pos);
 			destroy_entity(e);
 		}

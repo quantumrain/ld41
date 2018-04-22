@@ -210,32 +210,6 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 			}
 		break;
 
-		// custom
-
-		case WM_APP_UPDATE_MOUSE_CURSOR: {
-			bool show = !g_hide_mouse_cursor;
-
-			if (g_mouse_capture_state == mouse_capture::CAPTURED) {
-				RECT rc;
-				GetClientRect(g_win_hwnd, &rc);
-				MapWindowPoints(g_win_hwnd, 0, (POINT*)&rc, 2);
-
-				ClipCursor(&rc);
-				show = false;
-				SetCursor(0);
-				set_mouse_input(hwnd, true);
-			}
-			else {
-				set_mouse_input(hwnd, false);
-				ClipCursor(0);
-				show = !g_hide_mouse_cursor;
-				SetCursor(LoadCursor(0, IDC_ARROW));
-			}
-
-			ShowCursor(show);
-		}
-		return 0;
-
 		// window interaction
 
 		case WM_CLOSE:
@@ -316,6 +290,31 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 		case WM_SYSCHAR:
 			if ((wparam == VK_SPACE) && (lparam & 0x20000000))
 				break;
+		return 0;
+
+		// custom
+
+		case WM_APP_UPDATE_MOUSE_CURSOR: {
+			if (g_mouse_capture_state == mouse_capture::CAPTURED) {
+				RECT rc;
+				GetClientRect(g_win_hwnd, &rc);
+				MapWindowPoints(g_win_hwnd, 0, (POINT*)&rc, 2);
+
+				ClipCursor(&rc);
+				SetCursor(0);
+				set_mouse_input(hwnd, true);
+			}
+			else {
+				set_mouse_input(hwnd, false);
+				ClipCursor(0);
+				SetCursor(LoadCursor(0, IDC_ARROW));
+
+				RECT rc;
+				GetClientRect(g_win_hwnd, &rc);
+				MapWindowPoints(g_win_hwnd, 0, (POINT*)&rc, 2);
+				SetCursorPos((rc.left + rc.right) / 2, (rc.top + rc.bottom) / 2);
+			}
+		}
 		return 0;
 
 		// mouse

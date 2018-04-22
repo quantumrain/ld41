@@ -238,6 +238,19 @@ font load_font(const char* name);
 
 enum class sfx {
 	DIT,
+	UI_NO,
+	PLAYER_DIE,
+	PLAYER_HIT,
+	PLAYER_BUILD,
+	DRONE_SPOT,
+	DRONE_HIT,
+	DRONE_POP,
+	TURRET_FIRE,
+	TURRET_LOOP,
+	TURRET_ACQ,
+	COLLECTOR_ACQ,
+	INCITER_ACQ,
+	PICKUP,
 	_MAX
 };
 

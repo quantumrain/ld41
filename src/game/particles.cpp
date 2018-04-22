@@ -93,3 +93,22 @@ void fx_explosion(vec2 pos, float strength, int count, rgba c, float psize) {
 	}
 }
 
+void fx_circle(vec2 pos, float radius, int count, float wobble, rgba c, int dur_mult) {
+	for(int i = 0; i < count; i++) {
+		float f = i / (float)count;
+
+		psys_spawn(pos + radius * rotation(f * TAU) + g_rand.range(vec2(wobble)), g_rand.range(vec2(5.0f)), 0.95f, 1.5f, 0.5f, g_rand.range(PI), c, g_rand.range(5, 10) * dur_mult);
+	}
+}
+
+void fx_message(const char* message) {
+	g_world.message = message;
+	g_world.message_time = 1.5f;
+}
+
+float get_vol(vec2 pos) {
+	if (player* p = get_player())
+		return -length(p->_pos - pos) / 20.0f;
+
+	return 0.0f;
+}

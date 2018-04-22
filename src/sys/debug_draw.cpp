@@ -205,7 +205,7 @@ void debug_render(vec2 view_size, u64 game_ticks) {
 	gpu_set_const(0, g_debug_proj_view);
 	g_debug_draw_3d.render();
 
-	gpu_set_const(0, fit_ui_proj_view(640.0f, 360.0f, view_size.x / view_size.y, -64.0f, 64.0f));
+	gpu_set_const(0, fit_ui_proj_view(640.0f, 360.0f, view_size.x / view_size.y, -64.0f, 64.0f, 0));
 	g_debug_draw_2d.render();
 
 	g_debug_draw_3d.reset();
