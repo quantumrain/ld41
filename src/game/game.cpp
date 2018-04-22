@@ -53,7 +53,6 @@ void game_init() {
 	define_sound(sfx::PLAYER_BUILD,   "player_build",   2, 2);
 	define_sound(sfx::DRONE_SPOT,     "drone_spot",     2, 4);
 	define_sound(sfx::DRONE_HIT,      "drone_hit",      2, 2);
-	define_sound(sfx::DRONE_POP,      "drone_pop",      2, 2);
 	define_sound(sfx::TURRET_FIRE,    "turret_fire",    4, 2);
 	define_sound(sfx::TURRET_LOOP,    "turret_loop",    3, 0);
 	define_sound(sfx::TURRET_ACQ,     "turret_acq",     2, 2);
